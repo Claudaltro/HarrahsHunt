@@ -4,148 +4,110 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Harrah's Golden Egg Hunt 2026</title>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Arial Black', sans-serif; background: #000; color: white; height: 100vh; overflow: hidden; }
-    #camera-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    body { font-family: 'Arial Black', sans-serif; margin: 0; overflow: hidden; background: #000; }
     #screen-border { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0px solid transparent; z-index: 10; pointer-events: none; transition: all 0.5s ease; box-sizing: border-box; }
     #ui-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); width: 88%; text-align: center; z-index: 20; }
     .badge { padding: 16px 20px; border-radius: 16px; color: white; font-weight: bold; font-size: 1em; background: rgba(75,0,130,0.92); border: 2px solid #FFD700; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-    #egg-overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-60%); z-index: 15; text-align: center; animation: float 2s ease-in-out infinite alternate; }
-    #egg-overlay .egg-img { font-size: 120px; filter: drop-shadow(0 0 30px #FFD700); }
-    @keyframes float { from { transform: translate(-50%,-60%); } to { transform: translate(-50%,-70%); } }
-    #victory-screen { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; padding: 30px; border-radius: 25px; width: 82%; text-align: center; z-index: 30; border: 5px solid #FFD700; }
-    #victory-screen h2 { color: #4B0082; margin-bottom: 8px; font-size: 1.5em; }
-    #victory-screen p { color: #555; font-size: 0.85em; margin-bottom: 15px; }
-    #player-name { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #4B0082; border-radius: 8px; font-size: 1em; }
-    #save-btn { background: #4B0082; color: #FFD700; border: none; padding: 16px; width: 100%; font-weight: bold; border-radius: 12px; font-size: 1.1em; margin-top: 12px; cursor: pointer; animation: pulse 1s infinite alternate; }
-    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
-    #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a0033; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; text-align: center; padding: 30px; }
-    #start-screen h1 { color: #FFD700; font-size: 1.8em; margin-bottom: 10px; }
-    #start-screen p { color: #ddd; font-size: 0.95em; margin-bottom: 30px; line-height: 1.5; }
-    #start-btn { background: #FFD700; color: #4B0082; border: none; padding: 18px 40px; border-radius: 16px; font-size: 1.2em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 20px rgba(255,215,0,0.5); }
-    .egg-big { font-size: 80px; margin-bottom: 20px; }
-    #gps-tip { display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); width: 88%; background: rgba(255,50,50,0.95); color: white; padding: 16px; border-radius: 14px; text-align: center; z-index: 25; font-size: 0.9em; line-height: 1.5; border: 2px solid #FFD700; }
-    #gps-tip strong { display: block; font-size: 1.1em; margin-bottom: 6px; }
+    #victory-screen { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 25px; width: 82%; text-align: center; z-index: 100; border: 5px solid #FFD700; }
+    #victory-screen h2 { color: #4B0082; margin-bottom: 8px; }
+    #player-name { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #4B0082; border-radius: 8px; }
+    #save-btn { background: #4B0082; color: #FFD700; border: none; padding: 16px; width: 100%; font-weight: bold; border-radius: 12px; margin-top: 12px; }
+    #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a0033; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; text-align: center; padding: 30px; }
+    #start-btn { background: #FFD700; color: #4B0082; border: none; padding: 18px 40px; border-radius: 16px; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+    #countdown { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26,0,51,0.95); z-index: 300; color: #FFD700; font-size: 120px; align-items: center; justify-content: center; font-weight: bold; }
   </style>
 </head>
-<body>
+<body style="margin: 0; overflow: hidden;">
   <div id="start-screen">
-    <div class="egg-big">🥚</div>
-    <h1>Harrah's Golden Egg Hunt</h1>
-    <p>Tap below to start. Allow access to your <strong>camera</strong> and <strong>location</strong> when prompted.</p>
+    <div style="font-size: 80px;">🥚</div>
+    <h1 style="color: #FFD700;">Harrah's Golden Egg Hunt</h1>
+    <p style="color: #ddd; margin-top: 10px;">Find the 3D Golden Egg in Augmented Reality!</p>
     <button id="start-btn" onclick="startHunt()">🔍 START HUNT</button>
   </div>
-  <video id="camera-view" autoplay playsinline muted></video>
+
+  <div id="countdown">3</div>
   <div id="screen-border"></div>
-  <div id="ui-container">
-    <div id="status-text" class="badge">📡 Searching for egg...</div>
-  </div>
-  <div id="egg-overlay"><div class="egg-img">🥚</div></div>
+  <div id="ui-container"><div id="status-text" class="badge">📡 Connecting...</div></div>
+
   <div id="victory-screen">
     <h2>🥚 EGG DISCOVERED!</h2>
-    <p>Happy Easter from Harrah's! Go to the Casino Kiosk to claim your prize!</p>
+    <p>You found it! Enter your name to claim your treasure at the Kiosk.</p>
     <input type="text" id="player-name" placeholder="ENTER YOUR FULL NAME">
-    <button id="save-btn" onclick="claimPrize()">🏆 CLAIM MY PRIZE!</button>
+    <button id="save-btn" onclick="claimPrize()">🏆 CLAIM PRIZE</button>
   </div>
-  <div id="gps-tip">
-    <strong>📍 Location Permission Needed</strong>
-    Go to: iPhone Settings → Privacy → Location Services → Safari → "While Using"
-    <br>Then reload this page.
-  </div>
-  <audio id="win-sound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
-  <script>
-    const huntSchedule = [
-      {lat: 30.39318, lon: -88.97833},
-      {lat: 30.3932,  lon: -88.8828},
-      {lat: 30.3935,  lon: -88.8830},
-      {lat: 30.3938,  lon: -88.8832},
-      {lat: 30.3941,  lon: -88.8835},
-      {lat: 30.3944,  lon: -88.8838},
-      {lat: 30.3947,  lon: -88.8840},
-      {lat: 30.3950,  lon: -88.8842},
-      {lat: 30.3953,  lon: -88.8845},
-      {lat: 30.3956,  lon: -88.8848}
-    ];
-    const target = huntSchedule[0];
-    let gpsTimeout;
 
-    function getDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371000;
-      const dLat = (lat2-lat1)*Math.PI/180;
-      const dLon = (lon2-lon1)*Math.PI/180;
-      const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-        Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
-        Math.sin(dLon/2)*Math.sin(dLon/2);
-      return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-    }
+  <a-scene vr-mode-ui="enabled: false" embedded arjs="sourceType: camera; debugUIEnabled: false;">
+    <a-entity id="egg-entity" gps-entity-place="latitude: 30.39318; longitude: -88.97833;" visible="false" scale="15 15 15">
+      <a-sphere material="color: #FFD700; metalness: 1; roughness: 0.1; emissive: #FFA500; emissiveIntensity: 0.5"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
+      </a-sphere>
+    </a-entity>
+    <a-camera gps-camera rotation-reader></a-camera>
+  </a-scene>
+
+  <script>
+    const target = {lat: 30.39318, lon: -88.97833};
 
     function startHunt() {
       document.getElementById('start-screen').style.display = 'none';
-      navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})
-        .then(stream => { document.getElementById('camera-view').srcObject = stream; })
-        .catch(() => { document.getElementById('camera-view').style.display='none'; });
-      if (!navigator.geolocation) {
-        document.getElementById('status-text').innerHTML = '❌ GPS not supported on this device';
-        return;
-      }
-      // Show GPS tip if no position in 8 seconds
-      gpsTimeout = setTimeout(() => {
-        document.getElementById('gps-tip').style.display = 'block';
-      }, 8000);
-      navigator.geolocation.watchPosition(onPosition, onError, {
-        enableHighAccuracy: true, maximumAge: 0, timeout: 15000
-      });
+      const cd = document.getElementById('countdown');
+      cd.style.display = 'flex';
+      let count = 3;
+      const itv = setInterval(() => {
+        count--;
+        cd.innerHTML = count > 0 ? count : 'GO!';
+        if(count < 0) {
+          clearInterval(itv);
+          cd.style.display = 'none';
+          initGPS();
+        }
+      }, 1000);
     }
 
-    function onPosition(pos) {
-      clearTimeout(gpsTimeout);
-      document.getElementById('gps-tip').style.display = 'none';
-      const dist = getDistance(pos.coords.latitude, pos.coords.longitude, target.lat, target.lon);
-      const status = document.getElementById('status-text');
-      const border = document.getElementById('screen-border');
-      const d = Math.round(dist);
-      if (dist > 20) {
-        status.innerHTML = '❄️ COLD... ' + d + 'm away';
-        status.style.background = 'rgba(0,0,200,0.9)';
-        border.style.border = '12px solid blue';
-        document.getElementById('egg-overlay').style.display = 'none';
-      } else if (dist > 12) {
-        status.innerHTML = '🌡️ GETTING WARMER! ' + d + 'm';
-        status.style.background = 'rgba(255,140,0,0.9)';
-        border.style.border = '18px solid orange';
-        document.getElementById('egg-overlay').style.display = 'none';
-      } else if (dist > 1) {
-        status.innerHTML = '🔥 SCORCHING HOT! ' + d + 'm!';
-        status.style.background = 'rgba(200,0,0,0.9)';
-        border.style.border = '25px solid red';
-        document.getElementById('egg-overlay').style.display = 'block';
-      } else {
-        status.innerHTML = '✨ GOLDEN EGG FOUND! ✨';
-        status.style.background = 'rgba(255,215,0,0.95)';
-        status.style.color = '#4B0082';
-        border.style.border = '35px solid #FFD700';
-        document.getElementById('egg-overlay').style.display = 'block';
-        document.getElementById('victory-screen').style.display = 'block';
-        try { document.getElementById('win-sound').play(); } catch(e){}
-      }
-    }
+    function initGPS() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(pos => {
+          const R = 20925525; // FEET
+          const lat1 = pos.coords.latitude * Math.PI/180;
+          const lat2 = target.lat * Math.PI/180;
+          const dLat = (target.lat - pos.coords.latitude) * Math.PI/180;
+          const dLon = (target.lon - pos.coords.longitude) * Math.PI/180;
+          const a = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+          const distFeet = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 
-    function onError(err) {
-      const status = document.getElementById('status-text');
-      if (err.code === 1) {
-        status.innerHTML = '📍 Location BLOCKED - See tip below';
-        document.getElementById('gps-tip').style.display = 'block';
-      } else {
-        status.innerHTML = '📡 Acquiring GPS... please wait';
+          const st = document.getElementById('status-text');
+          const br = document.getElementById('screen-border');
+          const egg = document.getElementById('egg-entity');
+
+          if (distFeet > 65) {
+            st.innerHTML = '❄️ COLD... ' + distFeet + ' ft away';
+            st.style.background = 'rgba(0,0,200,0.9)'; br.style.border = '12px solid blue';
+            egg.setAttribute('visible', 'false');
+          } else if (distFeet > 20) {
+            st.innerHTML = '🌡️ WARMER! ' + distFeet + ' ft';
+            st.style.background = 'rgba(255,140,0,0.9)'; br.style.border = '18px solid orange';
+            egg.setAttribute('visible', 'false');
+          } else {
+            st.innerHTML = '🔥 HOT! ' + distFeet + ' ft! LOOK AROUND!';
+            st.style.background = 'rgba(200,0,0,0.9)'; br.style.border = '28px solid red';
+            egg.setAttribute('visible', 'true');
+            if (distFeet <= 5) {
+              document.getElementById('victory-screen').style.display = 'block';
+            }
+          }
+        }, null, {enableHighAccuracy:true});
       }
     }
 
     function claimPrize() {
-      const name = document.getElementById('player-name').value.trim();
-      if (!name) { alert('Please enter your full name!'); return; }
-      document.getElementById('victory-screen').style.display = 'none';
-      alert('CONGRATULATIONS ' + name.toUpperCase() + '! Show this screen at the Casino Kiosk! Happy Easter from Harrah\'s Gulf Coast!');
+      const n = document.getElementById('player-name').value.trim();
+      if(!n) return alert('Enter your name!');
+      alert('Congrats ' + n.toUpperCase() + '! Show this at the Kiosk!');
+      location.reload();
     }
   </script>
 </body>
