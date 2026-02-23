@@ -77,7 +77,7 @@
     const border = document.getElementById('screen-border');
     const eggContainer = document.getElementById('golden-egg');
     const sound = document.getElementById('sparkle-sound');
-    let hourIndex = new Date().getHours() - 8;
+    const hourIndex = 0; // TESTE - posicao fixa
     if (hourIndex < 0) hourIndex = 0;
     if (hourIndex > 9) hourIndex = 9;
     const target = huntSchedule[hourIndex];
