@@ -40,31 +40,30 @@
 </head>
 <body>
 
+<video id="camera-view" autoplay playsinline muted></video>
+
+<!-- START SCREEN -->
 <div id="start-screen">
     <h1>Harrah's Gulf Coast</h1>
     <h2>🥚 AR EGG HUNT 2026 🥚</h2>
 
     <div class="welcome-box">
-        <p>🎉 <strong>Bem-vindo! Welcome!</strong></p>
-        <p>Os ovos estão escondidos na <strong>Área do Cassino</strong> somente.<br>
-        The eggs are hidden in the <strong>Casino Area</strong> only.</p>
-        <p>Aponte sua câmera ao redor — quando estiver perto de um ovo, ele aparecerá na tela!<br>
-        <em>Point your camera around — when you're near an egg, it will appear on screen!</em></p>
-        <p class="rule">⚠️ Boa sorte! Each person may claim <strong>one egg only</strong>.<br>
-        Cada pessoa só pode fazer o claim de <strong>um ovo</strong>.</p>
+        <p>🎉 <strong>Welcome to the Egg Hunt!</strong></p>
+        <p>The eggs are hidden in the <strong>Casino Area only</strong>. Walk around and point your camera — when you get close to an egg, it will appear on screen!</p>
+        <p class="rule">⚠️ Each person may claim <strong>one egg only</strong>. Good luck!</p>
     </div>
 
     <button class="start-btn" onclick="startHunt()">🔍 START SEARCH</button>
 </div>
 
+<!-- AR UI -->
 <div id="ui-container">
-    <div id="status-badge" class="badge">
+    <div class="badge" id="status-badge">
         <span id="status-text">📡 CONNECTING...</span>
     </div>
 </div>
 
-<video id="camera-view" autoplay playsinline></video>
-
+<!-- EGG -->
 <div id="egg-container">
     <div id="egg-3d">
         <div class="egg-shell">
@@ -73,150 +72,142 @@
     </div>
 </div>
 
+<!-- SCREENSHOT BUTTON -->
 <button id="screenshot-btn" onclick="takeScreenshot()">📸 TAKE A SCREENSHOT</button>
 
-<div id="victory-modal" class="modal">
+<!-- VICTORY MODAL -->
+<div class="modal" id="victory-modal">
     <h2>✨ CONGRATULATIONS! ✨</h2>
     <p>You found the Egg! Keep it on screen and take a photo!</p>
 </div>
 
-<div id="claim-modal" class="modal">
+<!-- CLAIM MODAL -->
+<div class="modal" id="claim-modal">
     <h2>CLAIM YOUR PRIZE</h2>
-    <p>Enter your name and head to the <b>SportsBook Counter</b> to redeem!</p>
+    <p>Enter your name and head to the <strong>SportsBook Counter</strong> to redeem!</p>
     <input type="text" id="player-name" placeholder="Enter Full Name">
     <button class="action-btn" onclick="finalizeClaim()">CLAIM PRIZE!</button>
 </div>
 
 <script>
-// GOOGLE SHEETS CONFIG
-const GOOGLE_SHEET_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+    // GOOGLE SHEETS CONFIG
+    const GOOGLE_SHEET_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 
-// EGG LOCATIONS (10 Employee, 10 Guest)
-const EGGS = [
-    { id: "test_1", lat: 30.39318, lon: -88.97833, loc: "Hotel Lobby", type: "test" },
-    { id: "emp_1", lat: 30.39350, lon: -88.97800, loc: "Employee Lounge", type: "employee" },
-    { id: "emp_2", lat: 30.39360, lon: -88.97810, loc: "Back Office Area", type: "employee" },
-    { id: "guest_1", lat: 30.39400, lon: -88.97750, loc: "SportsBook Stand", type: "guest" },
-    { id: "guest_2", lat: 30.39410, lon: -88.97760, loc: "Casino Floor North", type: "guest" }
-];
+    // EGG LOCATIONS (10 Employee, 10 Guest)
+    const EGGS = [
+        { id: "test_1", lat: 30.39318, lon: -88.97833, loc: "Hotel Lobby", type: "test" },
+        { id: "emp_1", lat: 30.39350, lon: -88.97800, loc: "Employee Lounge", type: "employee" },
+        { id: "emp_2", lat: 30.39360, lon: -88.97810, loc: "Back Office Area", type: "employee" },
+        { id: "guest_1", lat: 30.39400, lon: -88.97750, loc: "SportsBook Stand", type: "guest" },
+        { id: "guest_2", lat: 30.39410, lon: -88.97760, loc: "Casino Floor North", type: "guest" }
+    ];
 
-let currentEgg = null;
-let eggVisible = false;
+    let currentEgg = null;
+    let eggVisible = false;
 
-function getDistFeet(lat1, lon1, lat2, lon2) {
-    const R = 20925525;
-    const dLat = (lat2-lat1)*Math.PI/180;
-    const dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
-}
-
-function startHunt() {
-    document.getElementById('start-screen').style.display = 'none';
-    initCamera();
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(onPos, onGeoError, { enableHighAccuracy: true });
-    } else {
-        alert("Geolocation is not supported by this browser.");
+    function getDistFeet(lat1, lon1, lat2, lon2) {
+        const R = 20925525;
+        const dLat = (lat2-lat1)*Math.PI/180;
+        const dLon = (lon2-lon1)*Math.PI/180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+        return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
     }
-}
 
-function onGeoError(error) {
-    console.error(error);
-    alert("Location access is required for the hunt. Please enable GPS and allow permissions.");
-}
-
-function initCamera() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(s => { document.getElementById('camera-view').srcObject = s; })
-        .catch(e => {
-            console.error(e);
-            alert("Camera access is required for AR. Please enable camera permissions.");
-        });
-}
-
-function onPos(pos) {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    let foundNearby = false;
-
-    for (const egg of EGGS) {
-        const dist = getDistFeet(lat, lon, egg.lat, egg.lon);
-        if (dist <= 15) {
-            if (localStorage.getItem(egg.id + "_claimed")) continue;
-            currentEgg = egg;
-            foundNearby = true;
-            showEgg(true);
-            document.getElementById('status-text').innerHTML = '🌋 YOU ARE ON IT! LOOK AROUND!';
-            document.getElementById('status-badge').style.background = 'rgba(200,0,0,0.85)';
-            break;
+    function startHunt() {
+        document.getElementById('start-screen').style.display = 'none';
+        initCamera();
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(onPos, onGeoError, { enableHighAccuracy: true });
+        } else {
+            alert("Geolocation is not supported by this browser.");
         }
     }
 
-    if (!foundNearby) {
-        currentEgg = null;
-        showEgg(false);
-        document.getElementById('status-text').innerHTML = '🔍 SEARCHING FOR EGGS...';
-        document.getElementById('status-badge').style.background = 'rgba(75,0,130,0.85)';
+    function onGeoError(error) {
+        console.error(error);
+        alert("Location access is required for the hunt. Please enable GPS and allow permissions.");
     }
-}
 
-function showEgg(show) {
-    const eggCont = document.getElementById('egg-container');
-    const screenBtn = document.getElementById('screenshot-btn');
-    if (show && !eggVisible) {
-        eggVisible = true;
-        eggCont.style.display = 'block';
-        setTimeout(() => {
-            if (eggVisible) {
-                document.getElementById('victory-modal').style.display = 'block';
-                screenBtn.style.display = 'block';
-                setTimeout(() => {
-                    if (eggVisible) {
-                        document.getElementById('victory-modal').style.display = 'none';
-                        document.getElementById('claim-modal').style.display = 'block';
-                    }
-                }, 4000);
+    function initCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(s => { document.getElementById('camera-view').srcObject = s; })
+        .catch(e => { console.error(e); alert("Camera access is required for AR. Please enable camera permissions."); });
+    }
+
+    function onPos(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        let foundNearby = false;
+        for (const egg of EGGS) {
+            const dist = getDistFeet(lat, lon, egg.lat, egg.lon);
+            if (dist <= 15) {
+                if (localStorage.getItem(egg.id + "_claimed")) continue;
+                currentEgg = egg;
+                foundNearby = true;
+                showEgg(true);
+                document.getElementById('status-text').innerHTML = '🌋 YOU ARE ON IT! LOOK AROUND!';
+                document.getElementById('status-badge').style.background = 'rgba(200,0,0,0.85)';
+                break;
             }
-        }, 4000);
-    } else if (!show && eggVisible) {
-        eggVisible = false;
-        eggCont.style.display = 'none';
-        screenBtn.style.display = 'none';
-        document.getElementById('victory-modal').style.display = 'none';
-        document.getElementById('claim-modal').style.display = 'none';
-    }
-}
-
-function takeScreenshot() {
-    alert("Moment captured! Make sure to save the photo to your gallery.");
-}
-
-function finalizeClaim() {
-    const name = document.getElementById('player-name').value.trim();
-    if (!name) return alert('Please enter your full name!');
-
-    localStorage.setItem(currentEgg.id + "_claimed", "true");
-
-    const data = {
-        egg_id: currentEgg.id,
-        location: currentEgg.loc,
-        winner: name,
-        time: new Date().toLocaleString()
-    };
-
-    if (GOOGLE_SHEET_URL !== "YOUR_APPS_SCRIPT_URL_HERE") {
-        fetch(GOOGLE_SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        }
+        if (!foundNearby) {
+            currentEgg = null;
+            showEgg(false);
+            document.getElementById('status-text').innerHTML = '🔍 SEARCHING FOR EGGS...';
+            document.getElementById('status-badge').style.background = 'rgba(75,0,130,0.85)';
+        }
     }
 
-    const subject = encodeURIComponent(`Egg Found: ${currentEgg.loc}`);
-    const body = encodeURIComponent(`Winner: ${name}\nLocation: ${currentEgg.loc}\nTime: ${data.time}`);
+    function showEgg(show) {
+        const eggCont = document.getElementById('egg-container');
+        const screenBtn = document.getElementById('screenshot-btn');
+        if (show && !eggVisible) {
+            eggVisible = true;
+            eggCont.style.display = 'block';
+            setTimeout(() => {
+                if (eggVisible) {
+                    document.getElementById('victory-modal').style.display = 'block';
+                    screenBtn.style.display = 'block';
+                    setTimeout(() => {
+                        if (eggVisible) {
+                            document.getElementById('victory-modal').style.display = 'none';
+                            document.getElementById('claim-modal').style.display = 'block';
+                        }
+                    }, 4000);
+                }
+            }, 4000);
+        } else if (!show && eggVisible) {
+            eggVisible = false;
+            eggCont.style.display = 'none';
+            screenBtn.style.display = 'none';
+            document.getElementById('victory-modal').style.display = 'none';
+            document.getElementById('claim-modal').style.display = 'none';
+        }
+    }
 
-    alert('Claim submitted! Click OK to open your email and send the confirmation.');
-    window.location.href = `mailto:cdaltro@gmail.com?subject=${subject}&body=${body}`;
+    function takeScreenshot() {
+        alert("Moment captured! Make sure to save the photo to your gallery.");
+    }
 
-    setTimeout(() => { location.reload(); }, 3000);
-}
+    function finalizeClaim() {
+        const name = document.getElementById('player-name').value.trim();
+        if (!name) return alert('Please enter your full name!');
+        localStorage.setItem(currentEgg.id + "_claimed", "true");
+        const data = {
+            egg_id: currentEgg.id,
+            location: currentEgg.loc,
+            winner: name,
+            time: new Date().toLocaleString()
+        };
+        if (GOOGLE_SHEET_URL !== "YOUR_APPS_SCRIPT_URL_HERE") {
+            fetch(GOOGLE_SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        }
+        const subject = encodeURIComponent(`Egg Found: ${currentEgg.loc}`);
+        const body = encodeURIComponent(`Winner: ${name}\nLocation: ${currentEgg.loc}\nTime: ${data.time}`);
+        alert('Claim submitted! Click OK to open your email and send the confirmation.');
+        window.location.href = `mailto:cdaltro@gmail.com?subject=${subject}&body=${body}`;
+        setTimeout(() => { location.reload(); }, 3000);
+    }
 </script>
 </body>
 </html>
