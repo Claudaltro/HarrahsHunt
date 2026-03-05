@@ -93,13 +93,17 @@
     // GOOGLE SHEETS CONFIG
     const GOOGLE_SHEET_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 
-    // EGG LOCATIONS (10 Employee, 10 Guest)
-    const EGGS = [
+    // EGG LOCATIONS (10 Total: 1 Test + 2 Employee + 7 Guest) - UPDATE LAT/LON BEFORE EVENT!    const EGGS = [
         { id: "test_1", lat: 30.39318, lon: -88.97833, loc: "Hotel Lobby", type: "test" },
         { id: "emp_1", lat: 30.39350, lon: -88.97800, loc: "Employee Lounge", type: "employee" },
         { id: "emp_2", lat: 30.39360, lon: -88.97810, loc: "Back Office Area", type: "employee" },
         { id: "guest_1", lat: 30.39400, lon: -88.97750, loc: "SportsBook Stand", type: "guest" },
         { id: "guest_2", lat: 30.39410, lon: -88.97760, loc: "Casino Floor North", type: "guest" }
+                { id: "guest_3", lat: 30.39420, lon: -88.97770, loc: "Slot Machine Area", type: "guest" },
+        { id: "guest_4", lat: 30.39430, lon: -88.97780, loc: "Restaurant Entrance", type: "guest" },
+        { id: "guest_5", lat: 30.39440, lon: -88.97790, loc: "Bar Counter", type: "guest" },
+        { id: "guest_6", lat: 30.39450, lon: -88.97800, loc: "Casino Floor South", type: "guest" },
+        { id: "guest_7", lat: 30.39460, lon: -88.97810, loc: "Near Exit Doors", type: "guest" }
     ];
 
     let currentEgg = null;
