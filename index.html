@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Harrah's Egg Hunt 2026</title>
+    <title>Harrah's Gulf Coast Egg Hunt 2026</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Arial Black', sans-serif; background: #000; overflow: hidden; height: 100vh; }
@@ -17,114 +17,93 @@
         /* STATUS */
         #ui-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); width: 88%; text-align: center; z-index: 20; }
         .badge { padding: 16px 20px; border-radius: 16px; color: white; font-weight: bold; font-size: 1.05em; background: rgba(75,0,130,0.92); border: 2px solid #FFD700; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-
-        /* 3D EGG CSS */
-        #egg-3d { 
-            display: none; 
-            position: fixed; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -55%); 
-            z-index: 15; 
-            text-align: center;
-            animation: floatEgg 2.5s ease-in-out infinite alternate;
-        }
-        .egg-shell {
-            width: 130px; height: 170px;
-            background: radial-gradient(circle at 38% 35%, #9B30CC, #4B0082 55%, #2a0050);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            box-shadow: 0 0 40px 15px rgba(255,165,0,0.7), inset -15px -20px 30px rgba(0,0,0,0.4), inset 8px 8px 20px rgba(180,100,255,0.4);
-            position: relative;
-            margin: 0 auto;
-            animation: spinGlow 3s linear infinite;
-        }
-        .egg-shine {
-            position: absolute; top: 18%; left: 22%; width: 30px; height: 50px;
-            background: rgba(255,255,255,0.35); border-radius: 50%; transform: rotate(-30deg);
-        }
-        .egg-glow {
-            position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
-            width: 100px; height: 25px; background: radial-gradient(ellipse, rgba(255,165,0,0.6), transparent);
-            border-radius: 50%;
-        }
-        @keyframes floatEgg {
-            from { transform: translate(-50%, -55%); }
-            to { transform: translate(-50%, -65%); }
-        }
-        @keyframes spinGlow {
-            0% { box-shadow: 0 0 40px 15px rgba(255,165,0,0.7), inset -15px -20px 30px rgba(0,0,0,0.4); }
-            50% { box-shadow: 0 0 60px 25px rgba(255,200,0,0.9), inset -15px -20px 30px rgba(0,0,0,0.4); }
-            100% { box-shadow: 0 0 40px 15px rgba(255,165,0,0.7), inset -15px -20px 30px rgba(0,0,0,0.4); }
-        }
-
-        .egg-label {
-            margin-top: 12px; background: rgba(255,215,0,0.9); color: #4B0082;
-            padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 0.9em;
-            animation: pulse 1s ease-in-out infinite alternate;
-        }
-
+        
+        /* 3D EGG (Purple with Golden Halo) */
+        #egg-3d { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -55%); z-index: 15; text-align: center; animation: floatEgg 2.5s ease-in-out infinite alternate; }
+        .egg-shell { width: 130px; height: 170px; background: radial-gradient(circle at 38% 35%, #9B30CC, #4B0082 55%, #2a0050); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 0 40px 15px rgba(255,165,0,0.7), inset -15px -20px 30px rgba(0,0,0,0.4), inset 8px 8px 20px rgba(180,100,255,0.4); position: relative; margin: 0 auto; }
+        
+        /* GOLDEN HALO (Moving like Pokemon GO) */
+        .golden-halo { position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px; border: 4px solid #FFD700; border-radius: 50%; opacity: 0.6; animation: haloMove 2s linear infinite; }
+        @keyframes haloMove { 0% { transform: scale(0.8) rotateX(70deg); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: scale(1.4) rotateX(70deg); opacity: 0; } }
+        
+        @keyframes floatEgg { from { transform: translate(-50%, -55%); } to { transform: translate(-50%, -65%); } }
+        
+        .egg-label { margin-top: 12px; background: rgba(255,215,0,0.9); color: #4B0082; padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 0.9em; animation: pulse 1s ease-in-out infinite alternate; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.06); } }
-
-        /* VICTORY */
-        #victory-screen { 
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); 
-            background: white; padding: 30px; border-radius: 25px; width: 82%; text-align: center; 
-            z-index: 40; border: 5px solid #FFD700; box-shadow: 0 0 40px rgba(255,215,0,0.6); 
-        }
-        #victory-screen h2 { color: #4B0082; margin-bottom: 8px; font-size: 1.5em; }
-        #victory-screen p { color: #555; font-size: 0.9em; margin-bottom: 15px; }
-        #player-name { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #4B0082; border-radius: 8px; font-size: 1em; }
-        #save-btn { background: #4B0082; color: #FFD700; border: none; padding: 16px; width: 100%; font-weight: bold; border-radius: 12px; font-size: 1.1em; margin-top: 12px; animation: pulse 1s infinite alternate; }
+        
+        /* VICTORY SCREENS */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; padding: 30px; border-radius: 25px; width: 85%; text-align: center; z-index: 40; border: 5px solid #FFD700; box-shadow: 0 0 40px rgba(255,215,0,0.6); }
+        .modal h2 { color: #4B0082; margin-bottom: 8px; font-size: 1.5em; }
+        .modal p { color: #555; font-size: 0.95em; margin-bottom: 15px; }
+        input[type="text"] { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #4B0082; border-radius: 8px; font-size: 1em; }
+        .action-btn { background: #4B0082; color: #FFD700; border: none; padding: 16px; width: 100%; font-weight: bold; border-radius: 12px; font-size: 1.1em; margin-top: 12px; }
+        
+        /* PHOTO BUTTON */
+        #photo-btn { display: none; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #4B0082; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; z-index: 30; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
 
         /* START SCREEN */
         #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a0033; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; text-align: center; padding: 30px; }
         #start-btn { background: #FFD700; color: #4B0082; border: none; padding: 18px 40px; border-radius: 16px; font-size: 1.2em; font-weight: bold; margin-top: 24px; }
-
+        
         /* COUNTDOWN */
         #countdown { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26,0,51,0.95); z-index: 60; color: #FFD700; font-size: 130px; align-items: center; justify-content: center; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <div id="start-screen">
-        <div style="font-size: 80px; margin-bottom: 20px;">🥚</div>
-        <h1 style="color: white; font-size: 1.8em; margin-bottom: 10px;">Harrah's Egg Hunt</h1>
-        <p style="color: #ccc; font-size: 1em;">Encontre o Ovo Roxo em Realidade Aumentada!</p>
-        <button id="start-btn" onclick="startHunt()">COMEÇAR BUSCA</button>
-    </div>
-
-    <div id="countdown">3</div>
-
-    <video id="camera-view" autoplay playsinline muted></video>
+    <video id="camera-view" autoplay playsinline></video>
     <div id="screen-border"></div>
-
+    
     <div id="ui-container">
-        <div id="status-badge" class="badge">
-            <span id="status-text">📡 Conectando...</span>
+        <div class="badge">
+            <span id="status-text">📡 CONNECTING...</span>
         </div>
     </div>
 
     <div id="egg-3d">
+        <div class="golden-halo"></div>
         <div class="egg-shell">
             <div class="egg-shine"></div>
             <div class="egg-glow"></div>
         </div>
-        <div class="egg-label">✨ OVO ENCONTRADO! TOQUE PARA PEGAR! ✨</div>
+        <div class="egg-label">✨ PURPLE EGG FOUND! ✨</div>
     </div>
 
-    <div id="victory-screen">
-        <h2>🥚 OVO ENCONTRADO!</h2>
-        <p>Incrível! Coloque seu nome aqui e vá ao SportsBook no cassino retirar seu prêmio!</p>
-        <input type="text" id="player-name" placeholder="SEU NOME COMPLETO">
-        <button id="save-btn" onclick="claimPrize()">🏆 RESGATAR PRÊMIO!</button>
+    <button id="photo-btn" onclick="takeScreenshot()">📸 TAKE PHOTO & WIN!</button>
+
+    <!-- Modal 1: Initial Victory -->
+    <div id="victory-modal" class="modal">
+        <h2>CONGRATULATIONS!</h2>
+        <p>You found the Purple Egg!</p>
+        <button class="action-btn" onclick="showClaimForm()">NEXT</button>
     </div>
+
+    <!-- Modal 2: Claim Form -->
+    <div id="claim-modal" class="modal">
+        <h2>REDEEM YOUR PRIZE</h2>
+        <p>Enter your name and visit the <b>SportsBook Counter</b> to claim your prize!</p>
+        <input type="text" id="player-name" placeholder="YOUR FULL NAME">
+        <button id="save-btn" class="action-btn" onclick="claimPrize()">CLAIM PRIZE!</button>
+    </div>
+
+    <div id="start-screen">
+        <h1 style="color:#FFD700; font-size: 2.5em;">Harrah's Egg Hunt</h1>
+        <p style="color:white; margin-top:10px;">Find the Purple Egg in Augmented Reality!</p>
+        <button id="start-btn" onclick="startHunt()">START HUNT</button>
+    </div>
+
+    <div id="countdown">3</div>
 
     <script>
-        const target = {lat: 30.39318, lon: -88.97833}; // Harrah's test coords
-        let victoryTimer = null;
+        // CONFIGURATION
+        const target = { lat: 30.39318, lon: -88.97833 }; // Harrah's Gulf Coast
+        const TEST_MODE = true; 
+        const APPEARANCE_TIME = 8000; // 8 seconds before buttons appear
+        
         let eggVisible = false;
+        let canInteract = false;
 
         function getDistFeet(lat1, lon1, lat2, lon2) {
-            const R = 20925525; // Earth radius in feet
+            const R = 20925525; 
             const dLat = (lat2-lat1)*Math.PI/180;
             const dLon = (lon2-lon1)*Math.PI/180;
             const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
@@ -138,7 +117,7 @@
             let count = 3;
             const itv = setInterval(() => {
                 count--;
-                cd.innerHTML = count > 0 ? count : 'VAI!';
+                cd.innerHTML = count > 0 ? count : 'GO!';
                 if (count < 0) {
                     clearInterval(itv);
                     cd.style.display = 'none';
@@ -148,21 +127,12 @@
         }
 
         function initSystems() {
-            // CAMERA
-            navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                audio: false 
-            }).then(stream => {
-                const vid = document.getElementById('camera-view');
-                vid.srcObject = stream;
-                vid.play();
-            }).catch(e => {
-                document.getElementById('camera-view').style.background = '#111';
-            });
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(s => { document.getElementById('camera-view').srcObject = s; })
+                .catch(e => console.error(e));
 
-            // GPS
             if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(onPos, null, { enableHighAccuracy: true, maximumAge: 0 });
+                navigator.geolocation.watchPosition(onPos, null, { enableHighAccuracy: true });
             }
         }
 
@@ -172,17 +142,17 @@
             const br = document.getElementById('screen-border');
             
             if (dist > 65) {
-                st.innerHTML = '❄️ FRIO... ' + dist + ' pés';
+                st.innerHTML = '❄️ COLD... ' + dist + ' ft';
                 st.parentElement.style.background = 'rgba(0,0,200,0.9)';
                 br.style.border = '12px solid #3399FF';
                 showEgg(false);
             } else if (dist > 20) {
-                st.innerHTML = '🔥 ESQUENTANDO! ' + dist + ' pés';
+                st.innerHTML = '🔥 WARMING UP! ' + dist + ' ft';
                 st.parentElement.style.background = 'rgba(255,140,0,0.9)';
                 br.style.border = '18px solid orange';
                 showEgg(false);
             } else {
-                st.innerHTML = '🌋 MUITO QUENTE! ' + dist + ' pés! OLHE AO REDOR!';
+                st.innerHTML = '🌋 HOT! LOOK AROUND!';
                 st.parentElement.style.background = 'rgba(200,0,0,0.9)';
                 br.style.border = '28px solid red';
                 showEgg(true);
@@ -194,29 +164,51 @@
             if (show && !eggVisible) {
                 eggVisible = true;
                 egg.style.display = 'block';
-                // Victory popup only after 3 seconds
-                victoryTimer = setTimeout(() => {
-                    document.getElementById('victory-screen').style.display = 'block';
-                    document.getElementById('status-text').innerHTML = '✨ OVO ENCONTRADO! ✨';
-                    document.getElementById('status-text').parentElement.style.background = 'rgba(255,215,0,0.95)';
-                    document.getElementById('status-text').parentElement.style.color = '#4B0082';
-                    document.getElementById('screen-border').style.border = '35px solid #FFD700';
-                }, 3000);
+                
+                // Wait 8 seconds before showing photo button
+                setTimeout(() => {
+                    document.getElementById('photo-btn').style.display = 'block';
+                }, APPEARANCE_TIME);
             } else if (!show && eggVisible) {
                 eggVisible = false;
                 egg.style.display = 'none';
-                if (victoryTimer) {
-                    clearTimeout(victoryTimer);
-                    victoryTimer = null;
-                }
+                document.getElementById('photo-btn').style.display = 'none';
             }
         }
 
+        function takeScreenshot() {
+            // In a real app, this would use canvas to merge video + egg
+            // For the prototype, we simulate the "capture" feel
+            document.getElementById('photo-btn').style.display = 'none';
+            
+            // Show Victory after 3 seconds of "photo" processing
+            setTimeout(() => {
+                document.getElementById('victory-modal').style.display = 'block';
+            }, 1000);
+        }
+
+        function showClaimForm() {
+            document.getElementById('victory-modal').style.display = 'none';
+            document.getElementById('claim-modal').style.display = 'block';
+        }
+
         function claimPrize() {
-            const n = document.getElementById('player-name').value.trim();
-            if (!n) return alert('Por favor, coloque seu nome completo!');
-            alert('PARABÉNS ' + n.toUpperCase() + '!
-Mostre esta tela no SportsBook do cassino para retirar seu prêmio!');
+            const name = document.getElementById('player-name').value.trim();
+            if (!name) return alert('Please enter your full name!');
+            
+            // Send to Google Sheets (Simulated for now, can use fetch to a GAS endpoint)
+            const data = {
+                name: name,
+                egg_id: 1,
+                location: 'Harrah\'s Gulf Coast',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Email redundancy
+            const mailLink = `mailto:cdaltro@gmail.com?subject=Egg Found!&body=Winner: ${name}%0ALocation: ${data.location}%0ATime: ${data.timestamp}`;
+            
+            alert('SUCCESS! Go to the SportsBook Counter now.');
+            window.location.href = mailLink;
         }
     </script>
 </body>
