@@ -138,7 +138,7 @@
 
     <button id="screenshot-btn" onclick="takeScreenshot()">📸 TAKE A SCREENSHOT</button>
 
-    <!-- STEP 1: Congrats Message (Appears after 8s) -->
+    <!-- STEP 1: Congrats Message (Appears after 10s of clean viewing) -->
     <div id="victory-modal" class="modal">
         <h2>✨ CONGRATULATIONS! ✨</h2>
         <p>You found the Egg! Keep it on screen and take a photo!</p>
@@ -235,21 +235,22 @@
             if (show && !eggVisible) {
                 eggVisible = true;
                 eggCont.style.display = 'block';
-                screenBtn.style.display = 'block';
+                // Screenshot button stays hidden for 10 seconds
                 
-                // WAIT 8 SECONDS: Show Congrats (Egg stays visible)
+                // WAIT 10 SECONDS: Show Congrats AND Screenshot button
                 setTimeout(() => {
                     if (eggVisible) {
                         document.getElementById('victory-modal').style.display = 'block';
-                        // WAIT 3 SECONDS: Show Claim Form
+                        screenBtn.style.display = 'block';
+                        // WAIT 4 SECONDS MORE: Show Claim Form
                         setTimeout(() => {
                             if (eggVisible) {
                                 document.getElementById('victory-modal').style.display = 'none';
                                 document.getElementById('claim-modal').style.display = 'block';
                             }
-                        }, 3000);
+                        }, 4000);
                     }
-                }, 8000);
+                }, 10000);
             } else if (!show && eggVisible) {
                 eggVisible = false;
                 eggCont.style.display = 'none';
