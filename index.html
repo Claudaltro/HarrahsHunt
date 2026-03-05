@@ -10,7 +10,7 @@
         #camera-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
         #ui-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; text-align: center; z-index: 20; }
         .badge { padding: 12px; border-radius: 12px; color: white; font-weight: bold; font-size: 0.9em; background: rgba(75,0,130,0.85); border: 2px solid #FFD700; transition: background 0.5s; }
-        
+
         /* PREMIUM 3D EGG VISUALS */
         #egg-container { display: none; position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 15; text-align: center; }
         #egg-3d { filter: drop-shadow(0 0 50px rgba(255,215,0,0.8)); animation: floatEgg 3s ease-in-out infinite alternate; }
@@ -26,16 +26,35 @@
         .action-btn { background: #4B0082; color: #FFD700; border: none; padding: 18px; width: 100%; font-weight: bold; border-radius: 15px; font-size: 1.1em; margin-top: 10px; cursor: pointer; }
         #screenshot-btn { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #4B0082; padding: 15px 30px; border-radius: 50px; font-weight: bold; z-index: 30; display: none; border: 3px solid #4B0082; }
         input[type="text"] { width: 100%; padding: 15px; margin: 5px 0; border: 3px solid #4B0082; border-radius: 12px; font-size: 1.1em; text-align: center; }
-        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a0033; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; padding: 30px; color: white; text-align: center; }
+
+        /* START SCREEN */
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a0033; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; padding: 30px; color: white; text-align: center; overflow-y: auto; }
+        #start-screen h1 { font-size: 1.8em; color: #FFD700; margin-bottom: 6px; }
+        #start-screen h2 { font-size: 1.3em; color: #ffffff; margin-bottom: 20px; letter-spacing: 2px; }
+        .welcome-box { background: rgba(255,255,255,0.08); border: 2px solid #FFD700; border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; max-width: 480px; width: 100%; }
+        .welcome-box p { font-size: 1.0em; line-height: 1.6; margin-bottom: 10px; color: #f0e6ff; }
+        .welcome-box p:last-child { margin-bottom: 0; }
+        .welcome-box .rule { color: #FFD700; font-size: 0.9em; margin-top: 12px; border-top: 1px solid rgba(255,215,0,0.3); padding-top: 12px; }
+        .start-btn { background: #FFD700; color: #1a0033; border: none; padding: 18px 40px; font-weight: bold; border-radius: 50px; font-size: 1.2em; margin-top: 10px; cursor: pointer; width: 100%; max-width: 480px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
 <div id="start-screen">
     <h1>Harrah's Gulf Coast</h1>
-    <h2>AR EGG HUNT 2026</h2>
-    <p style="margin: 20px 0;">Find the 10 hidden eggs around the casino to win prizes!</p>
-    <button class="action-btn" onclick="startHunt()">START SEARCH</button>
+    <h2>🥚 AR EGG HUNT 2026 🥚</h2>
+
+    <div class="welcome-box">
+        <p>🎉 <strong>Bem-vindo! Welcome!</strong></p>
+        <p>Os ovos estão escondidos na <strong>Área do Cassino</strong> somente.<br>
+        The eggs are hidden in the <strong>Casino Area</strong> only.</p>
+        <p>Aponte sua câmera ao redor — quando estiver perto de um ovo, ele aparecerá na tela!<br>
+        <em>Point your camera around — when you're near an egg, it will appear on screen!</em></p>
+        <p class="rule">⚠️ Boa sorte! Each person may claim <strong>one egg only</strong>.<br>
+        Cada pessoa só pode fazer o claim de <strong>um ovo</strong>.</p>
+    </div>
+
+    <button class="start-btn" onclick="startHunt()">🔍 START SEARCH</button>
 </div>
 
 <div id="ui-container">
@@ -85,7 +104,7 @@ let currentEgg = null;
 let eggVisible = false;
 
 function getDistFeet(lat1, lon1, lat2, lon2) {
-    const R = 20925525; // Earth radius in feet
+    const R = 20925525;
     const dLat = (lat2-lat1)*Math.PI/180;
     const dLon = (lon2-lon1)*Math.PI/180;
     const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
@@ -148,14 +167,10 @@ function showEgg(show) {
     if (show && !eggVisible) {
         eggVisible = true;
         eggCont.style.display = 'block';
-        
-        // Wait 4 seconds for egg viewing before showing Victory UI
         setTimeout(() => {
             if (eggVisible) {
                 document.getElementById('victory-modal').style.display = 'block';
                 screenBtn.style.display = 'block';
-                
-                // Wait 4 more seconds then show claim form
                 setTimeout(() => {
                     if (eggVisible) {
                         document.getElementById('victory-modal').style.display = 'none';
@@ -196,7 +211,7 @@ function finalizeClaim() {
 
     const subject = encodeURIComponent(`Egg Found: ${currentEgg.loc}`);
     const body = encodeURIComponent(`Winner: ${name}\nLocation: ${currentEgg.loc}\nTime: ${data.time}`);
-    
+
     alert('Claim submitted! Click OK to open your email and send the confirmation.');
     window.location.href = `mailto:cdaltro@gmail.com?subject=${subject}&body=${body}`;
 
